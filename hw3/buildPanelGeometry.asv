@@ -1,0 +1,37 @@
+function geom = buildPanelGeometry(x, y)
+% Build midpoints, tangents, normals from a closed contour (x,y).
+% Returns fields: midpp (Nx2), S (Nx1), tx, ty, nx, ny, beta (Nx1), N
+
+    % column vectors
+    x = x(:); y = y(:);
+
+    % Assume already closed; if not, close once
+
+    % Panel count
+    N = numel(x) - 1;
+
+    % Panel vectors and lengths
+    dx = diff(x); 
+    dy = diff(y);
+    S  = hypot(dx, dy);
+
+    % Unit tangents (from node i to i+1)
+    tx = dx ./ S; 
+    ty = dy ./ S;
+
+    % Outward unit normals for CCW contour (rotate +90°)
+    nx = -ty; 
+    ny =  tx;
+
+    % Midpoints (collocation points)
+    xc = 0.5*(x(1:end-1) + x(2:end));
+    yc = 0.5*(y(1:end-1) + y(2:end));
+    midpp = [xc, yc];
+
+    % Panel angle wrt x-axis
+    beta = atan2(dy, dx);
+
+    % Pack outputs
+    geom = struct('N',N,'midpp',midpp,'S',S,'tx',tx,'ty',ty,'nx',nx,'ny',ny,'beta',beta,...
+                  'x',x,'y',y);
+end
